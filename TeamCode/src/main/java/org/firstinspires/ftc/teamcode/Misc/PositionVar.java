@@ -15,33 +15,32 @@ public class PositionVar{
     }
 
     public double getX() {
-        return this.x;
+        return x;
     }
     public double getY() {
-        return this.y;
+        return y;
     }
     public double getR() {
-        return this.r;
+        return r;
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void setX(double X) {
+        x = X;
     }
     public void addToX(double dx){
-        this.x+=dx;
+        x+=dx;
     }
-    public void setY(double y) {
-        this.y = y;
+    public void setY(double Y) {
+        y = Y;
     }
     public void addToY(double dy){
-        this.y+=dy;
+        y+=dy;
     }
-    public void setR(double r) {
-        this.r = r;
+    public void setR(double R) {
+        r = R;
     }
-    public void addToR(double dr){
-        this.r+=dr;
-        this.r=loopedInput(this.r,-Pi,Pi);
+    public void addToR(double dr){ r+=dr;
+        r=loopedInput(r,-Pi,Pi);
     }
     public void setPos(PositionVar c){
         this.x = c.getX();
@@ -53,11 +52,16 @@ public class PositionVar{
     }
 
     private double loopedInput(double in,double min, double max){
-        while(in<min){
-            in+=max-min;
+        if(max>min){
+            double transitioner = min;
+            min=max;
+            max=transitioner;
         }
-        while(in>max){
-            in-=max-min;
+        if(in>0){
+            in=((in-max)%(min-max))+max;
+        }
+        else{
+            in=((in-min)%(max-min))+min;
         }
         return in;
     }//loops input value ex: 360deg=0deg and  400deg=40deg
