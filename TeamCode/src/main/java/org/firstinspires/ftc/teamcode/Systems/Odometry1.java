@@ -41,6 +41,8 @@ public class Odometry1 extends System{
 
     protected PositionVar currentPosition = new PositionVar(0,0,0);
     protected PositionVar targetPosition = new PositionVar(0,0,0);
+    public PositionVar initialPos = new PositionVar(0,0,0);
+
 
     HolonomicDriveTrain driveTrain;
 
@@ -49,7 +51,6 @@ public class Odometry1 extends System{
 
     protected int precision, precisionCounter = 0;
 
-    public PositionVar initialPos = new PositionVar(0,0,0);
 
     public Odometry1(DcMotor leftOdom, DcMotor sideOdom, DcMotor rightOdom, HolonomicDriveTrain DriveTrain){
         driveTrain = DriveTrain;
@@ -182,33 +183,18 @@ public class Odometry1 extends System{
         rd = ToMM*rightOdometer.getCurrentPosition();
         sd = -ToMM*perpindicularOdometer.getCurrentPosition();
 
-        double dy=0,dx=0;//initialize needed variables
-        a=(ld-rd)/BaseDist;//solve for change in rotation
+        double a = (ld-rd)/BaseDist;//change in orientation
+        double SD = sd+DfCoR*a;//correct sideways movement for rotation
+        double rc = (l+r)/(2*a));//find radius of movement arc
 
-        double Forw, Rightw; 
-        
-        if(a!=0){//check if change in rotation equals 0 so we don't divide by zero
-            sd+=DfCoR*a;//correct perp distance for rotation
-            rc=(ld+rd)/(2*a);//find average radius of arclengths
-            
-            forw=(rc+sd)*Math.sin(a);//find forward distance robot moves
-            rightw=rc*Math.sin(a)*Math.tan(a)+sd;//find rightward distance robot moves
-        }
-        else{
-            forw=ld;//without rotation math gets a lot simpler
-            rightw=sd;//without rotation math gets a lot simpler
-        }
-        
-        a = loopedInput(a,Pi,-Pi);
-        
-        dx = forw*Math.sin(a)+rightw*Math.sin(Pi/2+a);//solve for change in x relative to field
-        dy = forw*Math.cos(a)+rightw*Math.cos(Pi/2+a);//solve for change in y relative to field
+        double xp = rc * Math.cos(-initialPos.getR()) + initialPos.getX();//pivot point x
+        double yp = rc * Math.sin(-initialPos.getR()) + initialPos.getY();//pivot point y
 
+        double rf = a+initialPos.getR();//current position orientation
+        double xf = xp - (rc - SD) * Math.cos(rf);//current position x
+        double yf = yp + (rc - SD) * Math.sin(rf);//current position y
 
-        currentPosition.setR(a);
-        currentPosition.setX(dx);
-        currentPosition.setY(dy);
-
+        currentPosition.setPos(xf,yf,rf);
     }//find and save current position to x1, y1, and r1
     private void there(){
         double r2 = targetPosition.getR();
