@@ -48,6 +48,9 @@ public class PositionVar{
         this.y = c.getY();
         this.r = c.getR();
     }
+    public void setPos(double X, double Y, double R){
+        setPos(new PositionVar(X,Y,R));
+    }
 
     private double loopedInput(double in,double min, double max){
         while(in<min){
