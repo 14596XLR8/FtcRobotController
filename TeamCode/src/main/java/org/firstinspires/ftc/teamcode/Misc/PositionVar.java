@@ -38,6 +38,7 @@ public class PositionVar{
     }
     public void setR(double R) {
         r = R;
+        r=loopedInput(r,-Pi,Pi);
     }
     public void addToR(double dr){ r+=dr;
         r=loopedInput(r,-Pi,Pi);
